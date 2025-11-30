@@ -14,7 +14,7 @@ function switchTab(tab) {
     });
     document.getElementById(`tab-${tab}`).classList.remove('border-transparent', 'text-gray-500');
     document.getElementById(`tab-${tab}`).classList.add('border-indigo-500', 'text-indigo-600');
-    
+
     loadData();
 }
 
@@ -29,7 +29,7 @@ async function loadData() {
         else url = `${BASE_API}/interventions`; // Fix: Pakai BASE_API
 
         const res = await fetch(url, { headers });
-        
+
         // Handle Error Response
         if (!res.ok) throw new Error(`Gagal mengambil data (${res.status})`);
 
@@ -80,9 +80,9 @@ function renderTiles(tiles) {
             <td class="px-4 py-3 text-center font-bold text-gray-600">${t.position}</td>
             <td class="px-4 py-3">
                 <span class="px-2 py-1 rounded text-xs font-bold uppercase 
-                    ${t.type === 'risk' ? 'bg-red-100 text-red-700' : 
-                      (t.type === 'chance' ? 'bg-green-100 text-green-700' : 
-                      (t.type === 'quiz' ? 'bg-yellow-100 text-yellow-700' : 'bg-blue-100 text-blue-700'))}">
+                    ${t.type === 'risk' ? 'bg-red-100 text-red-700' :
+            (t.type === 'chance' ? 'bg-green-100 text-green-700' :
+                (t.type === 'quiz' ? 'bg-yellow-100 text-yellow-700' : 'bg-blue-100 text-blue-700'))}">
                     ${t.type}
                 </span>
             </td>
@@ -154,7 +154,7 @@ function renderInterventions(items) {
 async function showTileDetail(id) {
     const modal = document.getElementById('tile-modal');
     const body = document.getElementById('modal-body');
-    
+
     modal.classList.remove('hidden'); // Tampilkan Modal
     body.innerHTML = '<div class="loader"></div>';
 

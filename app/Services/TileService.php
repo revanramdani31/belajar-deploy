@@ -15,12 +15,12 @@ class TileService
     public function getAllTiles()
     {
         $tiles = $this->repo->getAll();
-        
+
         return $tiles->map(function ($tile) {
             $content = json_decode($tile->linked_content, true);
             $contentType = $content['content_type'] ?? null;
             $contentId = $content['content_id'] ?? null;
-            
+
             // Get landed stats
             $stats = $this->repo->getLandedStats($tile->tile_id);
 
@@ -39,7 +39,8 @@ class TileService
     public function getTileDetail($id)
     {
         $tile = $this->repo->findById($id);
-        if (!$tile) return null;
+        if (!$tile)
+            return null;
 
         $content = json_decode($tile->linked_content, true);
         $contentType = $content['content_type'] ?? null;

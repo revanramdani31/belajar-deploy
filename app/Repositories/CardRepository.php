@@ -21,9 +21,11 @@ class CardRepository
         }
 
         // Hitung usage secara otomatis lewat relasi (gunakan type_card format)
-        return $query->withCount(['decisions' => function (Builder $q) use ($type) {
+        return $query->withCount([
+            'decisions' => function (Builder $q) use ($type) {
                 $q->where('content_type', $type . '_card');
-            }])
+            }
+        ])
             ->orderBy('created_at', 'desc')
             ->paginate($limit);
     }
@@ -58,22 +60,22 @@ class CardRepository
             // 1. Hitung Total Attempts (Dari tabel player_decisions)
             ->selectSub(function ($q) {
                 $q->from('player_decisions')
-                  ->whereColumn('player_decisions.content_id', 'quiz_cards.id')
-                  ->where('player_decisions.content_type', 'quiz')
-                  ->selectRaw('count(*)');
+                    ->whereColumn('player_decisions.content_id', 'quiz_cards.id')
+                    ->where('player_decisions.content_type', 'quiz')
+                    ->selectRaw('count(*)');
             }, 'total_attempts')
-            
+
             // 2. Hitung Accuracy (Rata-rata jawaban benar)
             ->selectSub(function ($q) {
                 $q->from('player_decisions')
-                  ->whereColumn('player_decisions.content_id', 'quiz_cards.id')
-                  ->where('player_decisions.content_type', 'quiz')
-                  ->selectRaw('COALESCE(AVG(is_correct) * 100, 0)');
+                    ->whereColumn('player_decisions.content_id', 'quiz_cards.id')
+                    ->where('player_decisions.content_type', 'quiz')
+                    ->selectRaw('COALESCE(AVG(is_correct) * 100, 0)');
             }, 'accuracy')
-            
+
             // 3. Pastikan data kuis tetap terambil
             ->addSelect('quiz_cards.*')
-            
+
             ->orderBy('created_at', 'desc')
             ->paginate($limit);
     }

@@ -27,7 +27,7 @@ class AnalyticsService
     {
         $dau = $this->repo->getActiveUsersCount(1);
         $mau = $this->repo->getActiveUsersCount(30);
-        
+
         $cohortUsers = $this->repo->getCohortIds(now()->subDays(8), now()->subDays(7));
         $retained = $cohortUsers->count() > 0 ? $this->repo->getRetainedCount($cohortUsers) : 0;
         $rate = $cohortUsers->count() > 0 ? ($retained / $cohortUsers->count()) * 100 : 0;
@@ -43,15 +43,15 @@ class AnalyticsService
     {
         $period = $request->input('period', 'year');
         $groupBy = $request->input('group_by', 'month');
-        $startDate = match ($period) { 'month' => now()->subMonth(), default => now()->subYear() };
-        $format = match ($groupBy) { 'day' => '%Y-%m-%d', 'week' => '%Y-%u', default => '%Y-%m' };
+        $startDate = match ($period) { 'month' => now()->subMonth(), default => now()->subYear()};
+        $format = match ($groupBy) { 'day' => '%Y-%m-%d', 'week' => '%Y-%u', default => '%Y-%m'};
 
         $pGrowth = $this->repo->getGrowthData('auth_users', $startDate, $format);
         $sGrowth = $this->repo->getGrowthData('game_sessions', $startDate, $format);
 
         // Fill Gaps Logic (Simplified for brevity)
         $labels = $pGrowth->keys()->merge($sGrowth->keys())->unique()->sort()->values();
-        
+
         return [
             'labels' => $labels,
             'player_growth' => $labels->map(fn($k) => $pGrowth[$k] ?? 0),
@@ -63,10 +63,10 @@ class AnalyticsService
     {
         $sessions = $this->repo->getSessionDurations();
         $avg = $sessions->avg(fn($s) => Carbon::parse($s->started_at)->diffInMinutes(Carbon::parse($s->ended_at)));
-        
+
         // Asumsi total session di repo counts adalah active + completed
         $counts = $this->repo->getCounts(); // Reuse method
-        $total = $counts['sessions'] + $sessions->count(); 
+        $total = $counts['sessions'] + $sessions->count();
 
         return [
             'avg_session_time' => round($avg) . 'm',
@@ -103,8 +103,10 @@ class AnalyticsService
     public function getDifficulty($type)
     {
         $table = $type === 'quiz' ? 'quiz_cards' : 'scenarios';
-        return ['anomalies' => $this->repo->getDifficultyStats($table, $type)
-            ->filter(fn($i) => $i->acc < 30 || $i->acc > 90)->values()];
+        return [
+            'anomalies' => $this->repo->getDifficultyStats($table, $type)
+                ->filter(fn($i) => $i->acc < 30 || $i->acc > 90)->values()
+        ];
     }
 
     public function getDecisions($playerId)
@@ -112,9 +114,9 @@ class AnalyticsService
         $data = $this->repo->getPlayerDecisions($playerId);
         $time = $data->avg('decision_time_seconds');
         $acc = $data->avg('is_correct');
-        
+
         $style = ($time < 8) ? ($acc < 0.6 ? 'Impulsive' : 'Quick') : 'Analytical';
-        return ['avg_time' => round($time, 1).'s', 'style' => $style];
+        return ['avg_time' => round($time, 1) . 's', 'style' => $style];
     }
 
     public function getMistakes()
@@ -127,9 +129,9 @@ class AnalyticsService
         $stats = $this->repo->getInterventionStats();
         $total = ($stats->heeded ?? 0) + ($stats->ignored ?? 0);
         return [
-            'heeded' => (int)$stats->heeded, 
-            'ignored' => (int)$stats->ignored,
-            'success_rate' => $total > 0 ? round(($stats->heeded/$total)*100,1).'%' : '0%'
+            'heeded' => (int) $stats->heeded,
+            'ignored' => (int) $stats->ignored,
+            'success_rate' => $total > 0 ? round(($stats->heeded / $total) * 100, 1) . '%' : '0%'
         ];
     }
 
@@ -143,7 +145,8 @@ class AnalyticsService
         return ['data' => $this->repo->getCardStats()];
     }
 
-public function getQuizzes() {
+    public function getQuizzes()
+    {
         return ['data' => $this->repo->getContentStats('quiz_cards', 'id', 'quiz', 'question')];
     }
 
@@ -156,7 +159,8 @@ public function getQuizzes() {
     {
         $data = $this->repo->getTimeHeatmap();
         $grid = [];
-        foreach($data as $d) $grid[$d->day][$d->hour] = $d->count;
+        foreach ($data as $d)
+            $grid[$d->day][$d->hour] = $d->count;
         return ['heatmap' => $grid];
     }
 
@@ -164,9 +168,9 @@ public function getQuizzes() {
     {
         $scores = $this->repo->getScoreDistribution();
         $dist = [
-            '0-50' => $scores->filter(fn($s)=>$s<=50)->count(),
-            '51-100' => $scores->filter(fn($s)=>$s>50 && $s<=100)->count(),
-            '100+' => $scores->filter(fn($s)=>$s>100)->count(),
+            '0-50' => $scores->filter(fn($s) => $s <= 50)->count(),
+            '51-100' => $scores->filter(fn($s) => $s > 50 && $s <= 100)->count(),
+            '100+' => $scores->filter(fn($s) => $s > 100)->count(),
         ];
         return ['distribution' => $dist, 'avg' => round($scores->avg())];
     }
@@ -180,27 +184,30 @@ public function getQuizzes() {
                 ['stage' => 'Mid Game', 'count' => $stats['mid']],
                 ['stage' => 'Completed', 'count' => $stats['end']]
             ],
-            'completion_rate' => $stats['start'] > 0 ? round(($stats['end']/$stats['start'])*100,1).'%' : '0%'
+            'completion_rate' => $stats['start'] > 0 ? round(($stats['end'] / $stats['start']) * 100, 1) . '%' : '0%'
         ];
     }
 
-public function getOutcomes($request)
+    public function getOutcomes($request)
     {
         $category = $request->input('category', 'All');
-        
+
         // Parameter ke-2 di repo tidak terlalu efek karena kita filter manual di service, tapi kirim 10 aja
         $grouped = $this->repo->getLearningOutcomes($category, 10);
-        
-        $totalPre = 0; $totalPost = 0; $count = 0;
-        
+
+        $totalPre = 0;
+        $totalPost = 0;
+        $count = 0;
+
         // KITA PAKSA SAMPLE JADI 1 UNTUK DATA SEDIKIT
-        $sample = 1; 
+        $sample = 1;
 
         foreach ($grouped as $attempts) {
             $totalAttempts = $attempts->count();
 
             // Syarat: Minimal ada 2 data (1 buat pre, 1 buat post)
-            if ($totalAttempts < 2) continue;
+            if ($totalAttempts < 2)
+                continue;
 
             // Ambil Awal
             $preData = $attempts->take($sample);
@@ -209,7 +216,7 @@ public function getOutcomes($request)
             // Ambil Akhir
             $postData = $attempts->take(-$sample);
             $postScore = ($postData->where('is_correct', 1)->count() / $sample) * 100;
-            
+
             $totalPre += $preScore;
             $totalPost += $postScore;
             $count++;
