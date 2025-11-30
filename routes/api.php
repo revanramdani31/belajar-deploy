@@ -29,13 +29,7 @@ Route::get('/leaderboard', [LeaderboardController::class, 'getLeaderboard']);
 
 Route::prefix('admin')->group(function () {
     Route::post('/auth/login', [AdminAuthController::class, 'login']);
-
-});
-Route::middleware(['auth:api', 'role:admin'])->prefix('admin')->group(function () {
-    
-    Route::post('/auth/logout', [AdminAuthController::class, 'logout']);
-    // Paket 1: Players
-    Route::get('/players', [AdminPlayerController::class, 'index']);
+        Route::get('/players', [AdminPlayerController::class, 'index']);
     Route::get('/players/{id}', [AdminPlayerController::class, 'show']);
     Route::get('/players/{id}/analysis', [AdminPlayerController::class, 'analysis']);
     // Paket 2: Content Management
@@ -84,5 +78,11 @@ Route::middleware(['auth:api', 'role:admin'])->prefix('admin')->group(function (
         Route::get('/growth', [AdminMetricController::class, 'growthMetrics']);
         Route::get('/engagement', [AdminMetricController::class, 'engagement']);
     });
+
+});
+Route::middleware(['auth:api', 'role:admin'])->prefix('admin')->group(function () {
+    
+    Route::post('/auth/logout', [AdminAuthController::class, 'logout']);
+    // Paket 1: Players
     
 });
