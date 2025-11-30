@@ -9,7 +9,7 @@ class Player extends Model
     protected $primaryKey = 'PlayerId';
     public $incrementing = false;
     protected $keyType = 'string';
-    const CREATED_AT = 'createdAt';
+    const CREATED_AT = 'created_at';
     const UPDATED_AT = null;
 
     protected $fillable = ['PlayerId', 'user_id', 'name', 'gamesPlayed', 'initial_platform', 'locale'];

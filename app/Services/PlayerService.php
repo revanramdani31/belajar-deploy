@@ -27,16 +27,16 @@ class PlayerService
         $paginator->getCollection()->transform(function ($player) {
             return [
                 // Mapping ID agar tombol Detail berfungsi
-                'player_id' => $player->PlayerId, 
-                
+                'player_id' => $player->PlayerId,
+
                 // Data Pemain
                 'name' => $player->name,
                 'total_games' => $player->gamesPlayed,
-                'joined_at' => $player->createdAt,
+                'joined_at' => $player->created_at,
 
                 // Data Relasi (Mengambil dari tabel lain)
                 // Gunakan operator '??' (null coalescing) untuk mencegah error jika data kosong
-                'username' => $player->user->username ?? '-', 
+                'username' => $player->user->username ?? '-',
                 'status' => ($player->user->is_active ?? 1) ? 'Active' : 'Banned',
                 'cluster' => $player->profile->cluster ?? 'Belum Profiling',
             ];
@@ -48,7 +48,8 @@ class PlayerService
     public function getDetail($id)
     {
         $player = $this->repo->findById($id);
-        if (!$player) return null;
+        if (!$player)
+            return null;
 
         return [
             'player_info' => [
@@ -56,7 +57,7 @@ class PlayerService
                 'name' => $player->name,
                 'username' => $player->user->username ?? '-',
                 'status' => ($player->user->is_active ?? 1) ? 'Active' : 'Banned',
-                'join_date' => $player->createdAt,
+                'join_date' => $player->created_at,
                 'device_locale' => $player->locale
             ],
             // Pastikan relasi profile ada
@@ -69,8 +70,8 @@ class PlayerService
                 'last_updated' => $player->profile->last_updated
             ] : null,
             'lifetime_stats' => [
-               'total_games' => $player->gamesPlayed
-               // Tambahkan stats lain jika perlu
+                'total_games' => $player->gamesPlayed
+                // Tambahkan stats lain jika perlu
             ]
         ];
     }
@@ -78,10 +79,11 @@ class PlayerService
     public function getAnalysis($id)
     {
         $player = $this->repo->findById($id);
-        if (!$player) return null;
+        if (!$player)
+            return null;
 
         $stats = $this->repo->getAnalysisData($id);
-        
+
         $weaknesses = $stats->filter(fn($s) => $s->accuracy < 60)->values();
 
         return [

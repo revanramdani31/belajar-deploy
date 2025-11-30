@@ -12,15 +12,15 @@ class PlayerRepository
 
         if ($search) {
             $query->where('name', 'like', "%{$search}%")
-                  ->orWhereHas('user', function($q) use ($search) {
-                      $q->where('username', 'like', "%{$search}%");
-                  });
+                ->orWhereHas('user', function ($q) use ($search) {
+                    $q->where('username', 'like', "%{$search}%");
+                });
         }
 
         // Mapping sorting agar aman
-        $sortColumn = match($sort) {
+        $sortColumn = match ($sort) {
             'total_games' => 'gamesPlayed',
-            default => 'createdAt'
+            default => 'created_at'
         };
 
         return $query->orderBy($sortColumn, $dir)->paginate($limit);
@@ -37,9 +37,9 @@ class PlayerRepository
         return DB::table('player_decisions')
             ->where('player_id', $playerId)
             ->whereIn('content_type', ['scenario', 'quiz'])
-            ->leftJoin('scenarios', function($join) {
+            ->leftJoin('scenarios', function ($join) {
                 $join->on('player_decisions.content_id', '=', 'scenarios.id')
-                     ->where('player_decisions.content_type', '=', 'scenario');
+                    ->where('player_decisions.content_type', '=', 'scenario');
             })
             ->select(
                 DB::raw('COALESCE(scenarios.category, "General") as category'),

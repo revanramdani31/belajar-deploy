@@ -25,7 +25,7 @@ class AnalyticsRepository
 
     public function getCohortIds($start, $end)
     {
-        return DB::table('players')->whereBetween('createdAt', [$start, $end])->pluck('PlayerId');
+        return DB::table('players')->whereBetween('created_at', [$start, $end])->pluck('PlayerId');
     }
 
     public function getRetainedCount($userIds)
