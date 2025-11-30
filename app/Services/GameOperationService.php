@@ -46,7 +46,8 @@ class GameOperationService
     public function getSessionDetail($id)
     {
         $session = $this->repo->findById($id);
-        if (!$session) return null;
+        if (!$session)
+            return null;
 
         // Hitung Durasi
         $duration = '-';
@@ -74,7 +75,7 @@ class GameOperationService
                 'id' => $session->sessionId,
                 'status' => ucfirst($session->status),
                 // Gunakan null coalescing (??) agar tidak error jika host terhapus
-                'host' => $session->host->name ?? 'Unknown Host', 
+                'host' => $session->host->name ?? 'Unknown Host',
                 'created_at' => $session->created_at ? $session->created_at->toDateTimeString() : '-',
                 'started_at' => $session->started_at,
                 'ended_at' => $session->ended_at,
@@ -97,7 +98,7 @@ class GameOperationService
     public function getLeaderboard($limit)
     {
         $data = $this->repo->getGlobalLeaderboard($limit);
-        
+
         return $data->map(function ($player, $index) {
             return [
                 'rank' => $index + 1,
@@ -109,23 +110,23 @@ class GameOperationService
             ];
         });
     }
-    
+
     // Method tambahan untuk leaderboard per sesi (Endpoint khusus)
     public function getSessionLeaderboard($sessionId)
     {
-        return \Illuminate\Support\Facades\DB::table('ParticipatesIn')
-            ->join('players', 'ParticipatesIn.playerId', '=', 'players.PlayerId')
-            ->where('ParticipatesIn.sessionId', $sessionId)
+        return \Illuminate\Support\Facades\DB::table('participatesin')
+            ->join('players', 'participatesin.playerId', '=', 'players.PlayerId')
+            ->where('participatesin.sessionId', $sessionId)
             ->select(
                 'players.name',
                 'players.PlayerId as player_id',
-                'ParticipatesIn.score',
-                'ParticipatesIn.rank',
-                'ParticipatesIn.position as tile_position',
-                'ParticipatesIn.is_ready'
+                'participatesin.score',
+                'participatesin.rank',
+                'participatesin.position as tile_position',
+                'participatesin.is_ready'
             )
-            ->orderBy('ParticipatesIn.rank', 'asc')
-            ->orderBy('ParticipatesIn.score', 'desc')
+            ->orderBy('participatesin.rank', 'asc')
+            ->orderBy('participatesin.score', 'desc')
             ->get();
     }
 }

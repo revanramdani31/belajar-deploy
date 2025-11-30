@@ -21,10 +21,10 @@ class Player extends Model
 
     public function profile()
     {
-        return $this->hasOne(PlayerProfile::class, 'PlayerId', 'PlayerId');
+        return $this->hasOne(playerprofile::class, 'PlayerId', 'PlayerId');
     }
     public function participations()
     {
-        return $this->hasMany(ParticipatesIn::class, 'playerId', 'PlayerId');
+        return $this->hasMany(participatesin::class, 'playerId', 'PlayerId');
     }
 }

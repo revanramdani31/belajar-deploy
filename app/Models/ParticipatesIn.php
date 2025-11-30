@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ParticipatesIn extends Model
+class participatesin extends Model
 {
     use HasFactory;
 
     // Beri tahu Eloquent nama tabel yang benar
-    protected $table = 'ParticipatesIn';
+    protected $table = 'participatesin';
 
     // Tabel ini tidak punya timestamp 'created_at'/'updated_at'
     public $timestamps = false;

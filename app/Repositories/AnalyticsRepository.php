@@ -91,9 +91,9 @@ class AnalyticsRepository
     {
         return DB::table('player_decisions')
             ->join('scenarios', 'player_decisions.content_id', '=', 'scenarios.id')
-            ->join('scenario_options', function($join){
-                $join->on('player_decisions.content_id','=','scenario_options.scenarioId')
-                     ->on('player_decisions.selected_option','=','scenario_options.optionId');
+            ->join('scenario_options', function ($join) {
+                $join->on('player_decisions.content_id', '=', 'scenario_options.scenarioId')
+                    ->on('player_decisions.selected_option', '=', 'scenario_options.optionId');
             })
             ->where('player_decisions.is_correct', 0) // <--- FIXED: Spesifik tabel
             ->select('scenarios.title', 'scenario_options.text', DB::raw('count(*) as count'))
@@ -112,8 +112,8 @@ class AnalyticsRepository
     public function getContentStats($table, $joinCol, $type, $titleCol = 'title')
     {
         return DB::table($table)
-            ->leftJoin('player_decisions', function($j) use ($table, $joinCol, $type){
-                $j->on("$table.id",'=','player_decisions.content_id')->where('content_type', $type);
+            ->leftJoin('player_decisions', function ($j) use ($table, $joinCol, $type) {
+                $j->on("$table.id", '=', 'player_decisions.content_id')->where('content_type', $type);
             })
             // Gunakan $titleCol dinamis
             ->select("$table.$titleCol as title", DB::raw('AVG(player_decisions.is_correct)*100 as acc'), DB::raw('COUNT(player_decisions.id) as usage_count'))
@@ -124,7 +124,7 @@ class AnalyticsRepository
     public function getCardStats()
     {
         return DB::table('cards')
-            ->leftJoin('player_decisions', 'cards.id','=','player_decisions.content_id')
+            ->leftJoin('player_decisions', 'cards.id', '=', 'player_decisions.content_id')
             ->select('cards.title', DB::raw('AVG(player_decisions.score_change) as impact'), DB::raw('COUNT(player_decisions.id) as freq'))
             ->groupBy('cards.id', 'cards.title')
             ->orderByDesc('freq')->get();
@@ -147,7 +147,7 @@ class AnalyticsRepository
 
     public function getScoreDistribution()
     {
-        return DB::table('ParticipatesIn')->pluck('score');
+        return DB::table('participatesin')->pluck('score');
     }
 
     public function getFunnelStats()
@@ -167,7 +167,7 @@ class AnalyticsRepository
 
         if ($category !== 'All') {
             $query->join('scenarios', 'player_decisions.content_id', '=', 'scenarios.id')
-                  ->where('scenarios.category', $category);
+                ->where('scenarios.category', $category);
         }
 
         return $query->orderBy('created_at')->get()->groupBy('player_id');

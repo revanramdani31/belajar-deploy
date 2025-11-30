@@ -19,9 +19,16 @@ class GameSession extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'sessionId', 'host_player_id', 'max_players', 'max_turns', 
-        'status', 'current_player_id', 'current_turn', 
-        'game_state', 'started_at', 'ended_at'
+        'sessionId',
+        'host_player_id',
+        'max_players',
+        'max_turns',
+        'status',
+        'current_player_id',
+        'current_turn',
+        'game_state',
+        'started_at',
+        'ended_at'
     ];
 
     protected $casts = [
@@ -39,9 +46,9 @@ class GameSession extends Model
     // Relasi ke Peserta
     public function participants()
     {
-        return $this->hasMany(ParticipatesIn::class, 'sessionId', 'sessionId');
+        return $this->hasMany(participatesin::class, 'sessionId', 'sessionId');
     }
-    
+
     // Relasi ke Turns (Log Giliran)
     public function turns()
     {

@@ -3,9 +3,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PlayerProfile extends Model
+class playerprofile extends Model
 {
-    protected $table = 'PlayerProfile'; // Sesuai skema SQL
+    protected $table = 'playerprofile'; // Sesuai skema SQL
     protected $primaryKey = 'PlayerId';
     public $incrementing = false;
     public $timestamps = false; // Karena ada last_updated manual

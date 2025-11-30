@@ -9,7 +9,7 @@ class AdminInterventionController extends Controller
     public function index()
     {
         // 1. Ambil data mentah dari database
-        $templates = DB::table('InterventionTemplates')
+        $templates = DB::table('interventiontemplates')
             ->orderBy('level', 'asc')
             ->get();
 
@@ -18,18 +18,18 @@ class AdminInterventionController extends Controller
         $formatted = $templates->map(function ($tpl) {
             return [
                 // Mapping kolom DB ke nama variable Frontend
-                'level_id' => $tpl->level, 
-                'risk_label' => $tpl->risk_level, 
+                'level_id' => $tpl->level,
+                'risk_label' => $tpl->risk_level,
                 'title' => $tpl->title_template,       // Ubah title_template -> title
                 'message' => $tpl->message_template,   // Ubah message_template -> message
-                
+
                 // PENTING: Decode JSON string dari database menjadi Array PHP asli
-                'actions' => json_decode($tpl->actions_template), 
-                
+                'actions' => json_decode($tpl->actions_template),
+
                 'is_mandatory' => (bool) $tpl->is_mandatory,
-                
+
                 // Tambahan logika warna untuk UI
-                'ui_color' => match($tpl->risk_level) {
+                'ui_color' => match ($tpl->risk_level) {
                     'Critical' => 'red',
                     'High' => 'orange',
                     'Medium' => 'yellow',
